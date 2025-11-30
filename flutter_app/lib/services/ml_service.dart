@@ -33,19 +33,15 @@ class MLService {
     try {
       print('Downloading model from $url ...');
 
-      // Download model
       final response = await http.get(Uri.parse(url));
       if (response.statusCode != 200) throw Exception('Failed to download model');
 
-      // Save to temporary file
       final tempDir = await getTemporaryDirectory();
       final modelFile = File('${tempDir.path}/model.tflite');
       await modelFile.writeAsBytes(response.bodyBytes);
 
-      // Load interpreter
       _interpreter = await Interpreter.fromFile(modelFile);
 
-      // Optionally download labels
       if (labelsUrl != null) {
         final labelsResponse = await http.get(Uri.parse(labelsUrl));
         if (labelsResponse.statusCode == 200) {
@@ -67,5 +63,69 @@ class MLService {
     }
   }
 
-  // ... (reste de la classe predict, dispose, etc. reste inchangé)
+  /// Make a prediction
+  Future<Prediction> predict(List<List<double>> sensorData) async {
+    if (!_isInitialized || _interpreter == null) {
+      throw Exception('Model not initialized!');
+    }
+
+    final input = _prepareInput(sensorData);
+    final output = List.filled(_labels.length, 0.0).reshape([1, _labels.length]);
+
+    final startTime = DateTime.now();
+    _interpreter!.run(input, output);
+    final inferenceTime = DateTime.now().difference(startTime).inMilliseconds;
+
+    print('Inference time: ${inferenceTime}ms');
+
+    final probabilities = (output[0] as List).cast<double>();
+    double maxProb = probabilities[0];
+    int maxIndex = 0;
+    for (int i = 1; i < probabilities.length; i++) {
+      if (probabilities[i] > maxProb) {
+        maxProb = probabilities[i];
+        maxIndex = i;
+      }
+    }
+
+    final allProbs = <String, double>{};
+    for (int i = 0; i < _labels.length; i++) {
+      allProbs[_labels[i]] = probabilities[i];
+    }
+
+    print('Prediction: ${_labels[maxIndex]} (${(maxProb * 100).toStringAsFixed(1)}%)');
+
+    return Prediction(
+      label: _labels[maxIndex],
+      confidence: maxProb,
+      allProbabilities: allProbs,
+    );
+  }
+
+  /// Prepare sensor data for the model
+  List _prepareInput(List<List<double>> sensorData) {
+    final expectedSamples = 300;
+
+    List<List<double>> processedData;
+
+    if (sensorData.length == expectedSamples) {
+      processedData = sensorData;
+    } else if (sensorData.length < expectedSamples) {
+      processedData = List.from(sensorData);
+      while (processedData.length < expectedSamples) {
+        processedData.add([0.0, 0.0, 0.0]);
+      }
+    } else {
+      processedData = sensorData.sublist(0, expectedSamples);
+    }
+
+    return [processedData];
+  }
+
+  /// Dispose resources
+  void dispose() {
+    _interpreter?.close();
+    _isInitialized = false;
+    print('ML Service disposed');
+  }
 }
