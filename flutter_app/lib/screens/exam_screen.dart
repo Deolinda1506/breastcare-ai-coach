@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'qr_screen.dart'; // Écran pour scanner le QR code
+import 'qr_screen.dart'; // Pour afficher QR code
+import 'qr_scanner_screen.dart'; // Nouveau écran pour scanner
 import '../services/ml_service.dart';
 import '../services/sensor_service.dart';
 import '../models/prediction.dart';
@@ -78,18 +79,19 @@ class _ExamScreenState extends State<ExamScreen> {
   }
 
   void _openQRScanner() async {
-    final modelUrl = await Navigator.push(
+    // Utilisation d'un écran séparé pour scanner
+    final qrData = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const QRScreen()),
+      MaterialPageRoute(builder: (_) => const QRScannerScreen()),
     );
 
-    if (modelUrl != null && modelUrl is String) {
+    if (qrData != null && qrData is String) {
       setState(() {
         _statusMessage = 'Loading model from QR...';
       });
 
       try {
-        await _mlService.loadModelFromUrl(modelUrl);
+        await _mlService.loadModelFromUrl(qrData);
         setState(() {
           _isInitialized = true;
           _statusMessage = 'Model loaded! Ready to start';
@@ -109,17 +111,13 @@ class _ExamScreenState extends State<ExamScreen> {
         title: const Text('Guided Exam'),
         backgroundColor: Colors.pink.shade400,
         foregroundColor: Colors.white,
-        elevation: 0,
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.pink.shade400,
-              Colors.pink.shade50,
-            ],
+            colors: [Colors.pink.shade400, Colors.pink.shade50],
           ),
         ),
         child: SafeArea(
@@ -148,13 +146,7 @@ class _ExamScreenState extends State<ExamScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
         children: [
@@ -162,25 +154,13 @@ class _ExamScreenState extends State<ExamScreen> {
             children: [
               Icon(Icons.info_outline, color: Colors.pink.shade400),
               const SizedBox(width: 12),
-              Text(
-                'Instructions',
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text('Instructions', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 12),
           Text(
-            '• Place the phone on your wrist\n'
-            '• Make slow circular movements\n'
-            '• 3–4 circles in 3 seconds\n'
-            '• Medium, consistent pressure',
-            style: TextStyle(
-              color: Colors.grey.shade700,
-              height: 1.6,
-            ),
+            '• Place the phone on your wrist\n• Make slow circular movements\n• 3–4 circles in 3 seconds\n• Medium, consistent pressure',
+            style: TextStyle(color: Colors.grey.shade700, height: 1.6),
           ),
         ],
       ),
@@ -188,168 +168,70 @@ class _ExamScreenState extends State<ExamScreen> {
   }
 
   Widget _buildVisualization() {
-    if (_isCollecting) {
-      return _buildCollectingView();
-    } else if (_lastPrediction != null) {
-      return _buildResultView(_lastPrediction!);
-    } else {
-      return _buildReadyView();
-    }
+    if (_isCollecting) return _buildCollectingView();
+    if (_lastPrediction != null) return _buildResultView(_lastPrediction!);
+    return _buildReadyView();
   }
 
-  Widget _buildCollectingView() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 150,
-            height: 150,
-            child: CircularProgressIndicator(
-              strokeWidth: 8,
-              valueColor: AlwaysStoppedAnimation(Colors.white),
+  Widget _buildCollectingView() => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 150,
+              height: 150,
+              child: CircularProgressIndicator(strokeWidth: 8, valueColor: AlwaysStoppedAnimation(Colors.white)),
             ),
-          ),
-          const SizedBox(height: 32),
-          Text(
-            'Analysing...',
-            style: GoogleFonts.poppins(
-              fontSize: 24,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+            const SizedBox(height: 32),
+            Text('Analysing...', style: GoogleFonts.poppins(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      );
 
   Widget _buildResultView(Prediction prediction) {
     final color = _getColorForPrediction(prediction);
-
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: color.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            prediction.emoji,
-            style: const TextStyle(fontSize: 80),
-          ),
+          Text(prediction.emoji, style: const TextStyle(fontSize: 80)),
           const SizedBox(height: 24),
-          Text(
-            _getLabelText(prediction.label),
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
+          Text(_getLabelText(prediction.label),
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.bold, color: color)),
           const SizedBox(height: 16),
-          Text(
-            '${(prediction.confidence * 100).toStringAsFixed(1)}% confidence',
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey.shade600,
-            ),
-          ),
+          Text('${(prediction.confidence * 100).toStringAsFixed(1)}% confidence',
+              style: TextStyle(fontSize: 18, color: Colors.grey.shade600)),
           const SizedBox(height: 32),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              prediction.feedbackMessage,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: color.withOpacity(0.8),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          _buildProbabilitiesChart(prediction),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReadyView() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.pan_tool,
-            size: 120,
-            color: Colors.white.withOpacity(0.8),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Ready to start',
-            style: GoogleFonts.poppins(
-              fontSize: 24,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Tap a button below',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white.withOpacity(0.8),
-            ),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+            child: Text(prediction.feedbackMessage,
+                textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: color.withOpacity(0.8), fontWeight: FontWeight.w500)),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildProbabilitiesChart(Prediction prediction) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: prediction.allProbabilities.entries.map((entry) {
-        final percentage = entry.value * 100;
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(_getLabelText(entry.key), style: const TextStyle(fontSize: 12)),
-                  Text('${percentage.toStringAsFixed(1)}%', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const SizedBox(height: 4),
-              LinearProgressIndicator(
-                value: entry.value,
-                backgroundColor: Colors.grey.shade200,
-                valueColor: AlwaysStoppedAnimation(_getColorForLabel(entry.key)),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
+  Widget _buildReadyView() => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.pan_tool, size: 120, color: Colors.white.withOpacity(0.8)),
+            const SizedBox(height: 24),
+            Text('Ready to start', style: GoogleFonts.poppins(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            Text('Tap a button below', style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8))),
+          ],
+        ),
+      );
 
   Widget _buildActionButtons() {
     return Row(
@@ -362,8 +244,6 @@ class _ExamScreenState extends State<ExamScreen> {
             foregroundColor: Colors.pink.shade400,
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-            elevation: 8,
-            shadowColor: Colors.black.withOpacity(0.3),
           ),
           child: Row(
             children: [
@@ -381,8 +261,6 @@ class _ExamScreenState extends State<ExamScreen> {
             foregroundColor: Colors.pink.shade400,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-            elevation: 8,
-            shadowColor: Colors.black.withOpacity(0.3),
           ),
           child: Row(
             children: [
@@ -396,38 +274,21 @@ class _ExamScreenState extends State<ExamScreen> {
     );
   }
 
-  Widget _buildStatusText() {
-    return Text(
-      _statusMessage,
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-        shadows: [Shadow(color: Colors.black.withOpacity(0.3), blurRadius: 4)],
-      ),
-    );
-  }
+  Widget _buildStatusText() => Text(
+        _statusMessage,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          shadows: [Shadow(color: Colors.black.withOpacity(0.3), blurRadius: 4)],
+        ),
+      );
 
   Color _getColorForPrediction(Prediction prediction) {
     if (prediction.isCorrect) return Colors.green;
     if (prediction.label == 'erratic') return Colors.red;
     return Colors.orange;
-  }
-
-  Color _getColorForLabel(String label) {
-    switch (label) {
-      case 'circular_correct':
-        return Colors.green;
-      case 'circular_fast':
-        return Colors.orange;
-      case 'erratic':
-        return Colors.red;
-      case 'light_touch':
-        return Colors.amber;
-      default:
-        return Colors.grey;
-    }
   }
 
   String _getLabelText(String label) {
