@@ -25,6 +25,10 @@ dependencies:
   intl: ^0.20.2
   shared_preferences: ^2.2.2
 
+  # QR Scanner & Edge Impulse
+  qr_code_scanner: ^1.1.0
+  edge_impulse_flutter: ^1.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
