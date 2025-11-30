@@ -9,13 +9,10 @@ class QRScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Connect Device'),
-        backgroundColor: Colors.pink.shade400,
-      ),
+      appBar: AppBar(title: const Text('QR Code')),
       body: Center(
         child: QrImage(
-          data: qrData,
+          data: qrData,        // Le contenu du QR
           version: QrVersions.auto,
           size: 250.0,
         ),
