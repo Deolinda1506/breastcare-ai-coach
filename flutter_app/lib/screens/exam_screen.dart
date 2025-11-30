@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import '../services/ml_service.dart';
 import '../services/sensor_service.dart';
 import '../models/prediction.dart';
@@ -40,8 +41,36 @@ class _ExamScreenState extends State<ExamScreen> {
     }
   }
 
-  void _startExam() {
+  Future<String?> _scanQRCode() async {
+    String? qrResult;
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => QRViewExample(
+          onQRViewCreated: (controller, code) {
+            qrResult = code;
+            controller.dispose();
+            Navigator.pop(context);
+          },
+        ),
+      ),
+    );
+
+    return qrResult;
+  }
+
+  void _startExam() async {
     if (!_isInitialized || _isCollecting) return;
+
+    // Ouvrir le QR Scanner
+    setState(() => _statusMessage = 'Please scan the device QR code...');
+    final deviceCode = await _scanQRCode();
+
+    if (deviceCode == null || deviceCode.isEmpty) {
+      setState(() => _statusMessage = 'QR scan cancelled.');
+      return;
+    }
 
     setState(() {
       _isCollecting = true;
@@ -61,7 +90,6 @@ class _ExamScreenState extends State<ExamScreen> {
             _isCollecting = false;
             _statusMessage = prediction.feedbackMessage;
           });
-
         } catch (e) {
           setState(() {
             _isCollecting = false;
@@ -223,9 +251,7 @@ class _ExamScreenState extends State<ExamScreen> {
             prediction.emoji,
             style: const TextStyle(fontSize: 80),
           ),
-
           const SizedBox(height: 24),
-
           Text(
             _getLabelText(prediction.label),
             textAlign: TextAlign.center,
@@ -235,9 +261,7 @@ class _ExamScreenState extends State<ExamScreen> {
               color: color,
             ),
           ),
-
           const SizedBox(height: 16),
-
           Text(
             '${(prediction.confidence * 100).toStringAsFixed(1)}% confidence',
             style: TextStyle(
@@ -245,9 +269,7 @@ class _ExamScreenState extends State<ExamScreen> {
               color: Colors.grey.shade600,
             ),
           ),
-
           const SizedBox(height: 32),
-
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -264,7 +286,6 @@ class _ExamScreenState extends State<ExamScreen> {
               ),
             ),
           ),
-
           const SizedBox(height: 24),
           _buildProbabilitiesChart(prediction),
         ],
@@ -447,3 +468,26 @@ class _ExamScreenState extends State<ExamScreen> {
   }
 }
 
+/// QR Scanner Screen
+class QRViewExample extends StatelessWidget {
+  final void Function(QRViewController controller, String code) onQRViewCreated;
+
+  const QRViewExample({Key? key, required this.onQRViewCreated}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Scan QR Code')),
+      body: QRView(
+        key: qrKey,
+        onQRViewCreated: (controller) {
+          controller.scannedDataStream.listen((scanData) {
+            onQRViewCreated(controller, scanData.code ?? '');
+          });
+        },
+      ),
+    );
+  }
+}
