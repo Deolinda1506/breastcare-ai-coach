@@ -1,0 +1,40 @@
+name: breastcare_ai_coach
+description: AI-powered breast self-examination guidance
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ML & Sensors
+  tflite_flutter: ^0.12.1
+  sensors_plus: ^7.0.0
+
+  # UI & Charts
+  fl_chart: ^1.1.1
+  google_fonts: ^6.1.0
+
+  # Permissions
+  permission_handler: ^12.0.1
+
+  # Utils
+  intl: ^0.20.2
+  shared_preferences: ^2.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/model.tflite
+    - assets/labels.txt
+

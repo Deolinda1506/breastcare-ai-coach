@@ -1,0 +1,4 @@
+circular_correct
+circular_fast
+erratic
+light_touch
