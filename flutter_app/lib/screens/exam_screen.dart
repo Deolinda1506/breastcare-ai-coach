@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'qr_screen.dart'; // Écran pour scanner le QR code
 import '../services/ml_service.dart';
 import '../services/sensor_service.dart';
 import '../models/prediction.dart';
@@ -41,36 +41,8 @@ class _ExamScreenState extends State<ExamScreen> {
     }
   }
 
-  Future<String?> _scanQRCode() async {
-    String? qrResult;
-
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => QRViewExample(
-          onQRViewCreated: (controller, code) {
-            qrResult = code;
-            controller.dispose();
-            Navigator.pop(context);
-          },
-        ),
-      ),
-    );
-
-    return qrResult;
-  }
-
-  void _startExam() async {
+  void _startExam() {
     if (!_isInitialized || _isCollecting) return;
-
-    // Ouvrir le QR Scanner
-    setState(() => _statusMessage = 'Please scan the device QR code...');
-    final deviceCode = await _scanQRCode();
-
-    if (deviceCode == null || deviceCode.isEmpty) {
-      setState(() => _statusMessage = 'QR scan cancelled.');
-      return;
-    }
 
     setState(() {
       _isCollecting = true;
@@ -84,7 +56,6 @@ class _ExamScreenState extends State<ExamScreen> {
       onDataReady: (data) async {
         try {
           final prediction = await _mlService.predict(data);
-
           setState(() {
             _lastPrediction = prediction;
             _isCollecting = false;
@@ -104,6 +75,31 @@ class _ExamScreenState extends State<ExamScreen> {
         });
       },
     );
+  }
+
+  void _openQRScanner() async {
+    final modelUrl = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const QRScreen()),
+    );
+
+    if (modelUrl != null && modelUrl is String) {
+      setState(() {
+        _statusMessage = 'Loading model from QR...';
+      });
+
+      try {
+        await _mlService.loadModelFromUrl(modelUrl);
+        setState(() {
+          _isInitialized = true;
+          _statusMessage = 'Model loaded! Ready to start';
+        });
+      } catch (e) {
+        setState(() {
+          _statusMessage = 'Failed to load model: $e';
+        });
+      }
+    }
   }
 
   @override
@@ -135,7 +131,7 @@ class _ExamScreenState extends State<ExamScreen> {
                 const SizedBox(height: 32),
                 Expanded(child: _buildVisualization()),
                 const SizedBox(height: 32),
-                _buildActionButton(),
+                _buildActionButtons(),
                 const SizedBox(height: 16),
                 _buildStatusText(),
               ],
@@ -314,7 +310,7 @@ class _ExamScreenState extends State<ExamScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Tap the button below',
+            'Tap a button below',
             style: TextStyle(
               fontSize: 16,
               color: Colors.white.withOpacity(0.8),
@@ -338,26 +334,15 @@ class _ExamScreenState extends State<ExamScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    _getLabelText(entry.key),
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                  Text(
-                    '${percentage.toStringAsFixed(1)}%',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text(_getLabelText(entry.key), style: const TextStyle(fontSize: 12)),
+                  Text('${percentage.toStringAsFixed(1)}%', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
               ),
               const SizedBox(height: 4),
               LinearProgressIndicator(
                 value: entry.value,
                 backgroundColor: Colors.grey.shade200,
-                valueColor: AlwaysStoppedAnimation(
-                  _getColorForLabel(entry.key),
-                ),
+                valueColor: AlwaysStoppedAnimation(_getColorForLabel(entry.key)),
               ),
             ],
           ),
@@ -366,39 +351,48 @@ class _ExamScreenState extends State<ExamScreen> {
     );
   }
 
-  Widget _buildActionButton() {
-    return ElevatedButton(
-      onPressed: _isInitialized && !_isCollecting ? _startExam : null,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.pink.shade400,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 48,
-          vertical: 20,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-        elevation: 8,
-        shadowColor: Colors.black.withOpacity(0.3),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            _isCollecting ? Icons.hourglass_empty : Icons.play_arrow,
-            size: 28,
+  Widget _buildActionButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        ElevatedButton(
+          onPressed: _isInitialized && !_isCollecting ? _startExam : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.pink.shade400,
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            elevation: 8,
+            shadowColor: Colors.black.withOpacity(0.3),
           ),
-          const SizedBox(width: 12),
-          Text(
-            _isCollecting ? 'Analyzing...' : 'Start (3s)',
-            style: GoogleFonts.roboto(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
+          child: Row(
+            children: [
+              Icon(_isCollecting ? Icons.hourglass_empty : Icons.play_arrow, size: 28),
+              const SizedBox(width: 12),
+              Text(_isCollecting ? 'Analyzing...' : 'Start (3s)',
+                  style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w600)),
+            ],
           ),
-        ],
-      ),
+        ),
+        ElevatedButton(
+          onPressed: _openQRScanner,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.pink.shade400,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            elevation: 8,
+            shadowColor: Colors.black.withOpacity(0.3),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.qr_code_scanner, size: 28),
+              const SizedBox(width: 12),
+              Text('Scan QR', style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -410,24 +404,15 @@ class _ExamScreenState extends State<ExamScreen> {
         color: Colors.white,
         fontSize: 16,
         fontWeight: FontWeight.w500,
-        shadows: [
-          Shadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 4,
-          ),
-        ],
+        shadows: [Shadow(color: Colors.black.withOpacity(0.3), blurRadius: 4)],
       ),
     );
   }
 
   Color _getColorForPrediction(Prediction prediction) {
-    if (prediction.isCorrect) {
-      return Colors.green;
-    } else if (prediction.label == 'erratic') {
-      return Colors.red;
-    } else {
-      return Colors.orange;
-    }
+    if (prediction.isCorrect) return Colors.green;
+    if (prediction.label == 'erratic') return Colors.red;
+    return Colors.orange;
   }
 
   Color _getColorForLabel(String label) {
@@ -465,29 +450,5 @@ class _ExamScreenState extends State<ExamScreen> {
     _sensorService.dispose();
     _mlService.dispose();
     super.dispose();
-  }
-}
-
-/// QR Scanner Screen
-class QRViewExample extends StatelessWidget {
-  final void Function(QRViewController controller, String code) onQRViewCreated;
-
-  const QRViewExample({Key? key, required this.onQRViewCreated}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('Scan QR Code')),
-      body: QRView(
-        key: qrKey,
-        onQRViewCreated: (controller) {
-          controller.scannedDataStream.listen((scanData) {
-            onQRViewCreated(controller, scanData.code ?? '');
-          });
-        },
-      ),
-    );
   }
 }
