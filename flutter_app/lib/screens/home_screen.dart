@@ -13,10 +13,7 @@ class HomeScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.pink.shade50,
-              Colors.white,
-            ],
+            colors: [Colors.pink.shade50, Colors.white],
           ),
         ),
         child: SafeArea(
@@ -80,6 +77,7 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 48),
 
                   // Stats
+<<<<<<< HEAD
                   _buildStatCard(
                     '91%',
                     'Model Accuracy',
@@ -93,6 +91,13 @@ class HomeScreen extends StatelessWidget {
                     'Response Time',
                     Icons.flash_on,
                   ),
+=======
+                  _buildStatCard('91%', 'Model Accuracy', Icons.check_circle),
+
+                  const SizedBox(height: 16),
+
+                  _buildStatCard('1ms', 'Response Time', Icons.flash_on),
+>>>>>>> 35bf4f4 (fine)
 
                   const SizedBox(height: 48),
 
@@ -155,10 +160,14 @@ class HomeScreen extends StatelessWidget {
                   // Footer
                   Text(
                     'Made with ❤️ for women\'s health',
+<<<<<<< HEAD
                     style: TextStyle(
                       color: Colors.grey.shade500,
                       fontSize: 12,
                     ),
+=======
+                    style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+>>>>>>> 35bf4f4 (fine)
                   ),
 
                   const SizedBox(height: 20),
@@ -209,10 +218,7 @@ class HomeScreen extends StatelessWidget {
               ),
               Text(
                 label,
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
               ),
             ],
           ),
@@ -238,10 +244,7 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 'The AI detects if your movements are correct and guides you to the proper technique.',
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
               ),
             ],
           ),
@@ -279,9 +282,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Expanded(
-            child: Text(text),
-          ),
+          Expanded(child: Text(text)),
         ],
       ),
     );
