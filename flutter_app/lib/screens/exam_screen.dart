@@ -147,9 +147,10 @@ class _ExamScreenState extends State<ExamScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4))
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Column(
@@ -158,9 +159,13 @@ class _ExamScreenState extends State<ExamScreen> {
             children: [
               Icon(Icons.info_outline, color: Colors.pink.shade400),
               const SizedBox(width: 12),
-              Text('Instructions',
-                  style: GoogleFonts.poppins(
-                      fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(
+                'Instructions',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -180,25 +185,29 @@ class _ExamScreenState extends State<ExamScreen> {
   }
 
   Widget _buildCollectingView() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 150,
-              height: 150,
-              child: CircularProgressIndicator(
-                  strokeWidth: 8,
-                  valueColor: AlwaysStoppedAnimation(Colors.white)),
-            ),
-            const SizedBox(height: 32),
-            Text('Analysing...',
-                style: GoogleFonts.poppins(
-                    fontSize: 24,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold)),
-          ],
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 150,
+          height: 150,
+          child: CircularProgressIndicator(
+            strokeWidth: 8,
+            valueColor: AlwaysStoppedAnimation(Colors.white),
+          ),
         ),
-      );
+        const SizedBox(height: 32),
+        Text(
+          'Analysing...',
+          style: GoogleFonts.poppins(
+            fontSize: 24,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    ),
+  );
 
   Widget _buildResultView(Prediction prediction) {
     final color = _getColorForPrediction(prediction);
@@ -209,9 +218,10 @@ class _ExamScreenState extends State<ExamScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-              color: color.withOpacity(0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 10))
+            color: color.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
         ],
       ),
       child: Column(
@@ -219,26 +229,36 @@ class _ExamScreenState extends State<ExamScreen> {
         children: [
           Text(prediction.emoji, style: const TextStyle(fontSize: 80)),
           const SizedBox(height: 24),
-          Text(_getLabelText(prediction.label),
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                  fontSize: 28, fontWeight: FontWeight.bold, color: color)),
+          Text(
+            _getLabelText(prediction.label),
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
           const SizedBox(height: 16),
           Text(
-              '${(prediction.confidence * 100).toStringAsFixed(1)}% confidence',
-              style: TextStyle(fontSize: 18, color: Colors.grey.shade600)),
+            '${(prediction.confidence * 100).toStringAsFixed(1)}% confidence',
+            style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
+          ),
           const SizedBox(height: 32),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12)),
-            child: Text(prediction.feedbackMessage,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: 16,
-                    color: color.withOpacity(0.8),
-                    fontWeight: FontWeight.w500)),
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              prediction.feedbackMessage,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: color.withOpacity(0.8),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ],
       ),
@@ -246,66 +266,94 @@ class _ExamScreenState extends State<ExamScreen> {
   }
 
   Widget _buildReadyView() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.pan_tool,
-                size: 120, color: Colors.white.withOpacity(0.8)),
-            const SizedBox(height: 24),
-            Text('Ready to start',
-                style: GoogleFonts.poppins(
-                    fontSize: 24,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            Text('Tap a button below',
-                style: TextStyle(
-                    fontSize: 16, color: Colors.white.withOpacity(0.8))),
-          ],
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.pan_tool, size: 120, color: Colors.white.withOpacity(0.8)),
+        const SizedBox(height: 24),
+        Text(
+          'Ready to start',
+          style: GoogleFonts.poppins(
+            fontSize: 24,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      );
+        const SizedBox(height: 16),
+        Text(
+          'Tap a button below',
+          style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8)),
+        ),
+      ],
+    ),
+  );
 
   Widget _buildActionButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        ElevatedButton(
-          onPressed: _isInitialized && !_isCollecting ? _startExam : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.pink.shade400,
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-          ),
-          child: Row(
-            children: [
-              Icon(_isCollecting ? Icons.hourglass_empty : Icons.play_arrow,
-                  size: 28),
-              const SizedBox(width: 12),
-              Text(_isCollecting ? 'Analyzing...' : 'Start (3s)',
-                  style: GoogleFonts.roboto(
-                      fontSize: 20, fontWeight: FontWeight.w600)),
-            ],
+        Flexible(
+          child: ElevatedButton(
+            onPressed: _isInitialized && !_isCollecting ? _startExam : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.pink.shade400,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  _isCollecting ? Icons.hourglass_empty : Icons.play_arrow,
+                  size: 24,
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    _isCollecting ? 'Analyzing...' : 'Start (3s)',
+                    style: GoogleFonts.roboto(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        ElevatedButton(
-          onPressed: _openQRScanner,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.pink.shade400,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.qr_code_scanner, size: 28),
-              const SizedBox(width: 12),
-              Text('Scan QR',
-                  style: GoogleFonts.roboto(
-                      fontSize: 20, fontWeight: FontWeight.w600)),
-            ],
+        const SizedBox(width: 12),
+        Flexible(
+          child: ElevatedButton(
+            onPressed: _openQRScanner,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.pink.shade400,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.qr_code_scanner, size: 24),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    'Scan QR',
+                    style: GoogleFonts.roboto(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -313,17 +361,15 @@ class _ExamScreenState extends State<ExamScreen> {
   }
 
   Widget _buildStatusText() => Text(
-        _statusMessage,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          shadows: [
-            Shadow(color: Colors.black.withOpacity(0.3), blurRadius: 4)
-          ],
-        ),
-      );
+    _statusMessage,
+    textAlign: TextAlign.center,
+    style: TextStyle(
+      color: Colors.white,
+      fontSize: 16,
+      fontWeight: FontWeight.w500,
+      shadows: [Shadow(color: Colors.black.withOpacity(0.3), blurRadius: 4)],
+    ),
+  );
 
   Color _getColorForPrediction(Prediction prediction) {
     if (prediction.isCorrect) return Colors.green;
