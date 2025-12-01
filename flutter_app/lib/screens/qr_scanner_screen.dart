@@ -38,14 +38,46 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           _errorMessage = 'Camera permission is required to scan QR codes';
         }
       });
-    } else {
+    } else if (status.isPermanentlyDenied) {
       setState(() {
         _hasPermission = false;
         _isLoading = false;
         _errorMessage =
             'Camera permission was permanently denied. Please enable it in settings.';
       });
+    } else {
+      // Try to request permission anyway
+      final result = await Permission.camera.request();
+      setState(() {
+        _hasPermission = result.isGranted;
+        _isLoading = false;
+        if (!result.isGranted) {
+          _errorMessage = 'Camera permission is required to scan QR codes';
+        }
+      });
     }
+  }
+
+  Future<void> _requestPermission() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final result = await Permission.camera.request();
+    final status = await Permission.camera.status;
+
+    setState(() {
+      _hasPermission = result.isGranted;
+      _isLoading = false;
+      if (!result.isGranted) {
+        if (status.isPermanentlyDenied) {
+          _errorMessage =
+              'Camera permission was permanently denied. Please enable it in settings.';
+        } else {
+          _errorMessage = 'Camera permission is required to scan QR codes';
+        }
+      }
+    });
   }
 
   @override
@@ -93,12 +125,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () async {
-                    final result = await openAppSettings();
-                    if (result && mounted) {
-                      _checkCameraPermission();
-                    }
-                  },
+                  onPressed: _requestPermission,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.pink.shade400,
                     foregroundColor: Colors.white,
@@ -107,7 +134,34 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                       vertical: 16,
                     ),
                   ),
-                  child: const Text('Open Settings'),
+                  child: const Text('Autoriser la caméra'),
+                ),
+                const SizedBox(height: 16),
+                FutureBuilder<PermissionStatus>(
+                  future: Permission.camera.status,
+                  builder: (context, snapshot) {
+                    final status = snapshot.data ?? PermissionStatus.denied;
+                    if (status.isPermanentlyDenied) {
+                      return ElevatedButton(
+                        onPressed: () async {
+                          final result = await openAppSettings();
+                          if (result && mounted) {
+                            _checkCameraPermission();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey.shade300,
+                          foregroundColor: Colors.grey.shade700,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                        ),
+                        child: const Text('Ouvrir les paramètres'),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
                 ),
                 const SizedBox(height: 40),
               ],
