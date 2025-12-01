@@ -45,8 +45,10 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>We need camera access to scan QR codes for loading ML models</string>
+	<key>NSMotionUsageDescription</key>
+	<string>We use the accelerometer to analyze your self-exam movements</string>
 </dict>
 </plist>
-<key>NSMotionUsageDescription</key>
-<string>We use the accelerometer to analyze your self-exam movements</string>
 

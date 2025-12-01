@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'qr_screen.dart'; // Pour afficher QR code
-import 'qr_scanner_screen.dart'; // Nouveau écran pour scanner
+import 'qr_scanner_screen.dart';
 import '../services/ml_service.dart';
 import '../services/sensor_service.dart';
 import '../models/prediction.dart';
@@ -79,7 +78,7 @@ class _ExamScreenState extends State<ExamScreen> {
   }
 
   void _openQRScanner() async {
-    // Utilisation d'un écran séparé pour scanner
+    // Open QR scanner screen to load model from URL
     final qrData = await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const QRScannerScreen()),
@@ -146,7 +145,12 @@ class _ExamScreenState extends State<ExamScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4))
+        ],
       ),
       child: Column(
         children: [
@@ -154,7 +158,9 @@ class _ExamScreenState extends State<ExamScreen> {
             children: [
               Icon(Icons.info_outline, color: Colors.pink.shade400),
               const SizedBox(width: 12),
-              Text('Instructions', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('Instructions',
+                  style: GoogleFonts.poppins(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 12),
@@ -180,10 +186,16 @@ class _ExamScreenState extends State<ExamScreen> {
             SizedBox(
               width: 150,
               height: 150,
-              child: CircularProgressIndicator(strokeWidth: 8, valueColor: AlwaysStoppedAnimation(Colors.white)),
+              child: CircularProgressIndicator(
+                  strokeWidth: 8,
+                  valueColor: AlwaysStoppedAnimation(Colors.white)),
             ),
             const SizedBox(height: 32),
-            Text('Analysing...', style: GoogleFonts.poppins(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold)),
+            Text('Analysing...',
+                style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold)),
           ],
         ),
       );
@@ -195,7 +207,12 @@ class _ExamScreenState extends State<ExamScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: color.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
+        boxShadow: [
+          BoxShadow(
+              color: color.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10))
+        ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -204,16 +221,24 @@ class _ExamScreenState extends State<ExamScreen> {
           const SizedBox(height: 24),
           Text(_getLabelText(prediction.label),
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.bold, color: color)),
+              style: GoogleFonts.poppins(
+                  fontSize: 28, fontWeight: FontWeight.bold, color: color)),
           const SizedBox(height: 16),
-          Text('${(prediction.confidence * 100).toStringAsFixed(1)}% confidence',
+          Text(
+              '${(prediction.confidence * 100).toStringAsFixed(1)}% confidence',
               style: TextStyle(fontSize: 18, color: Colors.grey.shade600)),
           const SizedBox(height: 32),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12)),
             child: Text(prediction.feedbackMessage,
-                textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: color.withOpacity(0.8), fontWeight: FontWeight.w500)),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 16,
+                    color: color.withOpacity(0.8),
+                    fontWeight: FontWeight.w500)),
           ),
         ],
       ),
@@ -224,11 +249,18 @@ class _ExamScreenState extends State<ExamScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.pan_tool, size: 120, color: Colors.white.withOpacity(0.8)),
+            Icon(Icons.pan_tool,
+                size: 120, color: Colors.white.withOpacity(0.8)),
             const SizedBox(height: 24),
-            Text('Ready to start', style: GoogleFonts.poppins(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold)),
+            Text('Ready to start',
+                style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            Text('Tap a button below', style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8))),
+            Text('Tap a button below',
+                style: TextStyle(
+                    fontSize: 16, color: Colors.white.withOpacity(0.8))),
           ],
         ),
       );
@@ -243,14 +275,17 @@ class _ExamScreenState extends State<ExamScreen> {
             backgroundColor: Colors.white,
             foregroundColor: Colors.pink.shade400,
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           ),
           child: Row(
             children: [
-              Icon(_isCollecting ? Icons.hourglass_empty : Icons.play_arrow, size: 28),
+              Icon(_isCollecting ? Icons.hourglass_empty : Icons.play_arrow,
+                  size: 28),
               const SizedBox(width: 12),
               Text(_isCollecting ? 'Analyzing...' : 'Start (3s)',
-                  style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w600)),
+                  style: GoogleFonts.roboto(
+                      fontSize: 20, fontWeight: FontWeight.w600)),
             ],
           ),
         ),
@@ -260,13 +295,16 @@ class _ExamScreenState extends State<ExamScreen> {
             backgroundColor: Colors.white,
             foregroundColor: Colors.pink.shade400,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           ),
           child: Row(
             children: [
               const Icon(Icons.qr_code_scanner, size: 28),
               const SizedBox(width: 12),
-              Text('Scan QR', style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w600)),
+              Text('Scan QR',
+                  style: GoogleFonts.roboto(
+                      fontSize: 20, fontWeight: FontWeight.w600)),
             ],
           ),
         ),
@@ -281,7 +319,9 @@ class _ExamScreenState extends State<ExamScreen> {
           color: Colors.white,
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          shadows: [Shadow(color: Colors.black.withOpacity(0.3), blurRadius: 4)],
+          shadows: [
+            Shadow(color: Colors.black.withOpacity(0.3), blurRadius: 4)
+          ],
         ),
       );
 

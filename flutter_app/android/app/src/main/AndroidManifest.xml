@@ -42,7 +42,8 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
 </manifest>
-<uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
-<uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
 
