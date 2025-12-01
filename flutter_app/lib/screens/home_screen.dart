@@ -20,144 +20,150 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Logo
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.pink.shade100,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.favorite,
-                    size: 60,
-                    color: Colors.pink.shade400,
-                  ),
-                ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
 
-                const SizedBox(height: 32),
-
-                // Title
-                Text(
-                  'BreastCare',
-                  style: GoogleFonts.poppins(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.pink.shade400,
-                  ),
-                ),
-
-                Text(
-                  'AI Coach',
-                  style: GoogleFonts.poppins(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w300,
-                    color: Colors.grey.shade700,
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Description
-                Text(
-                  'Intelligent assistant for\nself-breast examination',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.roboto(
-                    fontSize: 18,
-                    color: Colors.grey.shade600,
-                    height: 1.5,
-                  ),
-                ),
-
-                const SizedBox(height: 48),
-
-                // Stats
-                _buildStatCard(
-                  '91%',
-                  'Model Accuracy',
-                  Icons.check_circle,
-                ),
-
-                const SizedBox(height: 16),
-
-                _buildStatCard(
-                  '1ms',
-                  'Response Time',
-                  Icons.flash_on,
-                ),
-
-                const SizedBox(height: 48),
-
-                // Main button
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ExamScreen(),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.pink.shade400,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 48,
-                      vertical: 16,
+                  // Logo
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: Colors.pink.shade100,
+                      shape: BoxShape.circle,
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    elevation: 4,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.play_arrow, size: 28),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Start Exam',
-                        style: GoogleFonts.roboto(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Secondary button
-                TextButton(
-                  onPressed: () {
-                    _showInfoDialog(context);
-                  },
-                  child: Text(
-                    'How does it work?',
-                    style: TextStyle(
+                    child: Icon(
+                      Icons.favorite,
+                      size: 60,
                       color: Colors.pink.shade400,
-                      fontSize: 16,
                     ),
                   ),
-                ),
 
-                const Spacer(),
+                  const SizedBox(height: 32),
 
-                // Footer
-                Text(
-                  'Made with ❤️ for women\'s health',
-                  style: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 12,
+                  // Title
+                  Text(
+                    'BreastCare',
+                    style: GoogleFonts.poppins(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.pink.shade400,
+                    ),
                   ),
-                ),
-              ],
+
+                  Text(
+                    'AI Coach',
+                    style: GoogleFonts.poppins(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Description
+                  Text(
+                    'Intelligent assistant for\nself-breast examination',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.roboto(
+                      fontSize: 18,
+                      color: Colors.grey.shade600,
+                      height: 1.5,
+                    ),
+                  ),
+
+                  const SizedBox(height: 48),
+
+                  // Stats
+                  _buildStatCard(
+                    '91%',
+                    'Model Accuracy',
+                    Icons.check_circle,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  _buildStatCard(
+                    '1ms',
+                    'Response Time',
+                    Icons.flash_on,
+                  ),
+
+                  const SizedBox(height: 48),
+
+                  // Main button
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ExamScreen(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pink.shade400,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 48,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      elevation: 4,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.play_arrow, size: 28),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Start Exam',
+                          style: GoogleFonts.roboto(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Secondary button
+                  TextButton(
+                    onPressed: () {
+                      _showInfoDialog(context);
+                    },
+                    child: Text(
+                      'How does it work?',
+                      style: TextStyle(
+                        color: Colors.pink.shade400,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Footer
+                  Text(
+                    'Made with ❤️ for women\'s health',
+                    style: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontSize: 12,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ),
@@ -281,4 +287,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
